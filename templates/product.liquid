@@ -1,0 +1,147 @@
+<div class="product-page">
+  <!-- GALLERY -->
+  <div class="product-gallery">
+    {% if product.featured_image %}
+      <img src="{{ product.featured_image | img_url: '800x800' }}" alt="{{ product.title }}" id="mainImage">
+    {% endif %}
+    {% if product.images.size > 1 %}
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:12px;">
+        {% for image in product.images %}
+          <img src="{{ image | img_url: '200x200' }}" alt="{{ product.title }}" onclick="document.getElementById('mainImage').src='{{ image | img_url: '800x800' }}'" style="border-radius:12px;border:1px solid var(--border);cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- INFO -->
+  <div class="product-info-block">
+    <div style="font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;">{{ product.type }}</div>
+    <h1>{{ product.title }}</h1>
+
+    <!-- PRICE -->
+    <div class="product-price-block" style="margin:24px 0;">
+      <span class="product-price-main">{{ product.price | money }}</span>
+      {% if product.compare_at_price > product.price %}
+        <span class="product-price-compare">{{ product.compare_at_price | money }}</span>
+        <span style="background:rgba(0,229,255,0.1);color:var(--accent);font-size:0.8rem;padding:4px 10px;border-radius:100px;margin-left:8px;">
+          -{{ product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price }}%
+        </span>
+      {% endif %}
+    </div>
+
+    <!-- BADGES -->
+    <div class="product-badges">
+      <div class="product-badge-item">✅ Spedizione gratuita sopra €35</div>
+      <div class="product-badge-item">↩️ Reso gratuito 30 giorni</div>
+      <div class="product-badge-item">🔒 Pagamento sicuro</div>
+    </div>
+
+    <!-- VARIANTS -->
+    {% if product.variants.size > 1 %}
+    <div class="product-variants">
+      {% for option in product.options_with_values %}
+        <label>{{ option.name }}</label>
+        <div style="margin-bottom:16px;">
+          {% for value in option.values %}
+            <button class="variant-btn {% if forloop.first %}active{% endif %}" onclick="selectVariant(this, '{{ option.name }}', '{{ value }}')">{{ value }}</button>
+          {% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- ADD TO CART -->
+    <form action="/cart/add" method="post" enctype="multipart/form-data">
+      <input type="hidden" name="id" id="variantId" value="{{ product.selected_or_first_available_variant.id }}">
+      <input type="hidden" name="quantity" value="1">
+      <button type="submit" class="add-to-cart-btn">
+        🛒 Aggiungi al carrello — {{ product.price | money }}
+      </button>
+    </form>
+
+    <a href="/cart" class="btn-secondary" style="justify-content:center;width:100%;margin-bottom:32px;">Vai al carrello →</a>
+
+    <!-- DESCRIPTION -->
+    <div class="product-desc">
+      {{ product.description }}
+    </div>
+
+    <!-- EXTRA INFO -->
+    <div style="border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:24px;">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:center;">
+        <span>🚚</span>
+        <div>
+          <div style="font-weight:500;font-size:0.9rem;">Spedizione in 7-15 giorni</div>
+          <div style="font-size:0.8rem;color:var(--muted);">Tracciamento incluso</div>
+        </div>
+      </div>
+      <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:center;">
+        <span>↩️</span>
+        <div>
+          <div style="font-weight:500;font-size:0.9rem;">Reso gratuito entro 30 giorni</div>
+          <div style="font-size:0.8rem;color:var(--muted);">Rimborso completo garantito</div>
+        </div>
+      </div>
+      <div style="padding:16px 20px;display:flex;gap:12px;align-items:center;">
+        <span>🔒</span>
+        <div>
+          <div style="font-weight:500;font-size:0.9rem;">Pagamento sicuro SSL</div>
+          <div style="font-size:0.8rem;color:var(--muted);">Carte, Apple Pay, Google Pay</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRODOTTI CORRELATI -->
+<section class="products-section" style="padding-top:40px;">
+  <div style="margin-bottom:40px;">
+    <div class="section-label">Potrebbero piacerti</div>
+    <h2 class="section-title" style="font-size:1.8rem;">Prodotti correlati</h2>
+  </div>
+  <div class="products-grid">
+    {% for prod in collections.all.products limit: 4 %}
+      {% unless prod.id == product.id %}
+      <a href="{{ prod.url }}" class="product-card">
+        <div class="product-card-img">
+          {% if prod.featured_image %}
+            <img src="{{ prod.featured_image | img_url: '600x600' }}" alt="{{ prod.title }}" loading="lazy">
+          {% else %}
+            <span style="font-size:4rem;">📦</span>
+          {% endif %}
+        </div>
+        <div class="product-card-info">
+          <div class="product-card-type">{{ prod.type | default: 'Smart Home' }}</div>
+          <div class="product-card-title">{{ prod.title }}</div>
+          <div class="product-card-footer">
+            <div class="product-card-price">{{ prod.price | money }}</div>
+            <span class="product-card-btn">+</span>
+          </div>
+        </div>
+      </a>
+      {% endunless %}
+    {% endfor %}
+  </div>
+</section>
+
+<script>
+const variants = {{ product.variants | json }};
+
+function selectVariant(btn, optionName, value) {
+  btn.closest('.product-variants').querySelectorAll('.variant-btn').forEach(b => {
+    if(b.textContent.trim() === btn.textContent.trim()) b.classList.add('active');
+    else b.classList.remove('active');
+  });
+  const selectedValues = [];
+  document.querySelectorAll('.variant-btn.active').forEach(b => selectedValues.push(b.textContent.trim()));
+  const match = variants.find(v => selectedValues.every(val => v.title.includes(val)));
+  if(match) {
+    document.getElementById('variantId').value = match.id;
+    document.querySelector('.add-to-cart-btn').textContent = '🛒 Aggiungi al carrello — ' + formatMoney(match.price);
+  }
+}
+
+function formatMoney(cents) {
+  return '€' + (cents / 100).toFixed(2).replace('.', ',');
+}
+</script>

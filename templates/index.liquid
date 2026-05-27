@@ -1,0 +1,112 @@
+<!-- HERO -->
+<section class="hero" style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 24px 80px;position:relative;overflow:hidden;">
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(0,229,255,0.08) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 80%,rgba(124,58,237,0.08) 0%,transparent 50%);"></div>
+
+  <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.2);border-radius:100px;padding:6px 16px;font-size:0.8rem;color:var(--accent);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:32px;animation:fadeUp 0.8s ease both;">
+    <span style="width:6px;height:6px;background:var(--accent);border-radius:50%;display:inline-block;"></span>
+    🇮🇹 Spedizione in tutta Italia
+  </div>
+
+  <h1 style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(3rem,8vw,7rem);line-height:0.95;letter-spacing:-0.03em;margin-bottom:24px;animation:fadeUp 0.8s 0.1s ease both;">
+    La tua casa<br>
+    <span style="display:block;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,0.3);">più <span style="color:var(--accent);-webkit-text-stroke:0;">intelligente</span></span>
+  </h1>
+
+  <p style="max-width:540px;font-size:1.1rem;color:var(--muted);line-height:1.7;margin-bottom:48px;animation:fadeUp 0.8s 0.2s ease both;">
+    Gadget smart home e accessori cucina selezionati per rendere la tua vita quotidiana più comoda, efficiente e moderna.
+  </p>
+
+  <div style="display:flex;gap:16px;align-items:center;animation:fadeUp 0.8s 0.3s ease both;">
+    <a href="/collections/all" class="btn-primary">Scopri i prodotti →</a>
+    <a href="#features" class="btn-secondary">Come funziona ↓</a>
+  </div>
+
+  <div style="display:flex;gap:48px;margin-top:80px;animation:fadeUp 0.8s 0.4s ease both;">
+    <div style="text-align:center;">
+      <div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--accent);">500+</div>
+      <div style="font-size:0.8rem;color:var(--muted);letter-spacing:0.05em;text-transform:uppercase;margin-top:4px;">Clienti soddisfatti</div>
+    </div>
+    <div style="text-align:center;">
+      <div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--accent);">12</div>
+      <div style="font-size:0.8rem;color:var(--muted);letter-spacing:0.05em;text-transform:uppercase;margin-top:4px;">Prodotti selezionati</div>
+    </div>
+    <div style="text-align:center;">
+      <div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--accent);">4.9★</div>
+      <div style="font-size:0.8rem;color:var(--muted);letter-spacing:0.05em;text-transform:uppercase;margin-top:4px;">Valutazione media</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODOTTI IN EVIDENZA -->
+<section class="products-section">
+  <div class="products-header">
+    <div>
+      <div class="section-label">Catalogo</div>
+      <h2 class="section-title">I nostri prodotti</h2>
+    </div>
+    <a href="/collections/all" class="btn-secondary">Vedi tutti →</a>
+  </div>
+
+  <div class="products-grid">
+    {% for product in collections.all.products limit: 12 %}
+    <a href="{{ product.url }}" class="product-card">
+      <div class="product-card-img">
+        {% if product.featured_image %}
+          <img src="{{ product.featured_image | img_url: '600x600' }}" alt="{{ product.title }}" loading="lazy">
+        {% else %}
+          <span style="font-size:4rem;">📦</span>
+        {% endif %}
+      </div>
+      <div class="product-card-info">
+        <div class="product-card-type">{{ product.type | default: 'Smart Home' }}</div>
+        <div class="product-card-title">{{ product.title }}</div>
+        <div class="product-card-footer">
+          <div class="product-card-price">
+            {% if product.compare_at_price > product.price %}
+              <s>{{ product.compare_at_price | money }}</s>
+            {% endif %}
+            {{ product.price | money }}
+          </div>
+          <span class="product-card-btn">+</span>
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- RECENSIONI -->
+<section style="padding:100px 48px;background:var(--surface);border-top:1px solid var(--border);">
+  <div style="text-align:center;margin-bottom:64px;">
+    <div class="section-label" style="justify-content:center;">Recensioni Verificate</div>
+    <h2 class="section-title">Lo dicono i nostri clienti</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;">
+    {% assign reviews = "Marco T.,Milano,Ho preso lo smart plug e la lampadina smart. Setup in 2 minuti, funzionano perfettamente con Alexa. Qualità ottima per il prezzo.|Giulia R.,Roma,Il mini chopper è fantastico! Lo uso ogni giorno. Trita l'aglio in 3 secondi e si lava facilmente. Lo consiglio a tutti.|Luca M.,Napoli,Le strisce LED hanno trasformato il mio studio. Ho passato il link a 5 amici dopo aver postato su Instagram. Spedizione velocissima!" | split: "|" %}
+    {% for review in reviews %}
+      {% assign parts = review | split: "," %}
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:28px;transition:border-color 0.3s;">
+        <div style="color:var(--accent3);font-size:0.9rem;margin-bottom:16px;">★★★★★</div>
+        <p style="font-size:0.95rem;line-height:1.7;color:var(--muted);margin-bottom:20px;font-style:italic;">"{{ parts[2] }}"</p>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:0.9rem;font-weight:700;color:#000;flex-shrink:0;">{{ parts[0] | slice: 0 }}</div>
+          <div>
+            <div style="font-weight:500;font-size:0.9rem;">{{ parts[0] }}</div>
+            <div style="font-size:0.78rem;color:var(--muted);">{{ parts[1] }}</div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<section style="padding:80px 48px;text-align:center;position:relative;overflow:hidden;">
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 80% 80% at 50% 50%,rgba(0,229,255,0.06) 0%,transparent 70%);"></div>
+  <div style="position:relative;z-index:1;max-width:600px;margin:0 auto;">
+    <div class="section-label" style="justify-content:center;">Offerta limitata</div>
+    <h2 class="section-title">Spedizione gratuita<br>sopra i €35</h2>
+    <p style="color:var(--muted);margin:16px 0 36px;font-size:1rem;line-height:1.7;">Aggiungi almeno due prodotti al carrello e la spedizione è nostra.</p>
+    <a href="/collections/all" class="btn-primary">Inizia ad acquistare →</a>
+  </div>
+</section>

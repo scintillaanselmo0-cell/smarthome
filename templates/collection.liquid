@@ -1,0 +1,42 @@
+<section class="products-section">
+  <div class="products-header">
+    <div>
+      <div class="section-label">Catalogo</div>
+      <h2 class="section-title">{{ collection.title }}</h2>
+      {% if collection.description != blank %}
+        <p style="color:var(--muted);margin-top:12px;font-size:0.95rem;">{{ collection.description }}</p>
+      {% endif %}
+    </div>
+    <div style="font-size:0.85rem;color:var(--muted);">{{ collection.products_count }} prodotti</div>
+  </div>
+
+  <div class="products-grid">
+    {% for product in collection.products %}
+    <a href="{{ product.url }}" class="product-card">
+      <div class="product-card-img">
+        {% if product.featured_image %}
+          <img src="{{ product.featured_image | img_url: '600x600' }}" alt="{{ product.title }}" loading="lazy">
+        {% else %}
+          <span style="font-size:4rem;">📦</span>
+        {% endif %}
+        {% if product.compare_at_price > product.price %}
+          <div style="position:absolute;top:16px;left:16px;background:var(--accent3);color:#000;font-size:0.7rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;padding:4px 10px;border-radius:100px;z-index:2;">Offerta</div>
+        {% endif %}
+      </div>
+      <div class="product-card-info">
+        <div class="product-card-type">{{ product.type | default: 'Smart Home' }}</div>
+        <div class="product-card-title">{{ product.title }}</div>
+        <div class="product-card-footer">
+          <div class="product-card-price">
+            {% if product.compare_at_price > product.price %}
+              <s>{{ product.compare_at_price | money }}</s>
+            {% endif %}
+            {{ product.price | money }}
+          </div>
+          <span class="product-card-btn">+</span>
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
