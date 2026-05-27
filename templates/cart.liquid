@@ -1,0 +1,79 @@
+<div class="cart-page">
+  <h1>Il tuo carrello</h1>
+
+  {% if cart.item_count == 0 %}
+    <div style="text-align:center;padding:80px 0;">
+      <div style="font-size:4rem;margin-bottom:24px;">🛒</div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:1.5rem;margin-bottom:16px;">Il carrello è vuoto</h2>
+      <p style="color:var(--muted);margin-bottom:32px;">Aggiungi qualcosa per iniziare!</p>
+      <a href="/collections/all" class="btn-primary">Scopri i prodotti →</a>
+    </div>
+  {% else %}
+    <form action="/cart" method="post">
+      {% for item in cart.items %}
+      <div class="cart-line">
+        <a href="{{ item.url }}">
+          <img src="{{ item.image | img_url: '150x150' }}" alt="{{ item.title }}">
+        </a>
+        <div class="cart-line-info">
+          <div class="cart-line-title">{{ item.product.title }}</div>
+          {% unless item.variant.title == 'Default Title' %}
+            <div style="font-size:0.82rem;color:var(--muted);margin-bottom:4px;">{{ item.variant.title }}</div>
+          {% endunless %}
+          <div class="cart-line-price">{{ item.price | money }}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:100px;padding:6px 16px;">
+            <button type="button" onclick="updateQty({{ item.variant.id }}, {{ item.quantity | minus: 1 }})" style="background:none;border:none;color:var(--text);cursor:pointer;font-size:1rem;">−</button>
+            <span>{{ item.quantity }}</span>
+            <button type="button" onclick="updateQty({{ item.variant.id }}, {{ item.quantity | plus: 1 }})" style="background:none;border:none;color:var(--text);cursor:pointer;font-size:1rem;">+</button>
+          </div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;min-width:70px;text-align:right;">{{ item.line_price | money }}</div>
+          <a href="/cart/change?id={{ item.variant.id }}&quantity=0" style="color:var(--muted);font-size:0.85rem;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--muted)'">✕</a>
+        </div>
+      </div>
+      {% endfor %}
+
+      <div class="cart-totals">
+        {% if cart.total_price < 3500 %}
+        <div style="background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.15);border-radius:12px;padding:16px;margin-bottom:24px;font-size:0.88rem;color:var(--accent);">
+          💡 Aggiungi ancora {{ 3500 | minus: cart.total_price | money }} per la spedizione gratuita!
+        </div>
+        {% else %}
+        <div style="background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.15);border-radius:12px;padding:16px;margin-bottom:24px;font-size:0.88rem;color:var(--accent);">
+          ✅ Hai la spedizione gratuita!
+        </div>
+        {% endif %}
+
+        <div class="cart-total-row">
+          <span>Subtotale</span>
+          <span>{{ cart.total_price | money }}</span>
+        </div>
+        <div class="cart-total-row">
+          <span>Spedizione</span>
+          <span>{% if cart.total_price >= 3500 %}Gratuita{% else %}Calcolata al checkout{% endif %}</span>
+        </div>
+        <div class="cart-total-row final">
+          <span>Totale</span>
+          <span>{{ cart.total_price | money }}</span>
+        </div>
+      </div>
+
+      <button type="submit" name="checkout" class="btn-primary" style="width:100%;justify-content:center;padding:18px;font-size:1rem;">
+        Procedi al pagamento →
+      </button>
+      <a href="/collections/all" class="btn-secondary" style="justify-content:center;width:100%;margin-top:16px;">← Continua lo shopping</a>
+    </form>
+  {% endif %}
+</div>
+
+<script>
+function updateQty(variantId, qty) {
+  if(qty < 0) qty = 0;
+  fetch('/cart/change.js', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({id: variantId, quantity: qty})
+  }).then(() => location.reload());
+}
+</script>
